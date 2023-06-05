@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FarmersMarket"
         mc:Ignorable="d"
-        Title="Farmers Market Admin" Height="450
+        Title="Farmers Market Admin" Height="600
         " Width="850">
     <Grid>
         <Canvas>
@@ -15,13 +15,13 @@
                 </Rectangle.Effect>
             </Rectangle>
             <Label Content="Farmer's market inventory system" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" FontWeight="Bold" Canvas.Left="198"/>
-            <DataGrid x:Name="dataGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Canvas.Left="77" Canvas.Top="267" Width="693" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <DataGrid x:Name="dataGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Canvas.Left="78" Canvas.Top="274" Width="694" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             <Button x:Name="InsertSQL" Content="Insert" Height="40" Width="124" FontSize="16" Click="InsertSQL_Click" HorizontalAlignment="Left" Canvas.Left="490" Canvas.Top="144" VerticalAlignment="Top"/>
             <Button x:Name="DeleteSQL" Content="Delete" Height="40" Width="124" FontSize="16" Background="#FFEEC3C3" Click="DeleteSQL_Click" HorizontalAlignment="Left" Canvas.Left="490" Canvas.Top="197" VerticalAlignment="Top"/>
             <Button x:Name="UpdateSQL" Content="Update" Height="40" Width="124" FontSize="16" Background="#FF7CDC8F" Click="UpdateSQL_Click" HorizontalAlignment="Left" Canvas.Left="646" Canvas.Top="144" VerticalAlignment="Top"/>
             <Button x:Name="SelectSQL" Content="Show" Height="40" Width="124" FontSize="16" Background="#FFD4DC9B" Click="SelectSQL_Click" HorizontalAlignment="Left" Canvas.Left="646" Canvas.Top="197" VerticalAlignment="Top"/>
             <TextBox x:Name="searchProductID" TextWrapping="Wrap" Text="Insert Product ID" Width="153" Height="24" FontSize="16" HorizontalAlignment="Left" Canvas.Left="490" Canvas.Top="77" VerticalAlignment="Top"/>
-            <Button x:Name="searchBtn" Content="Search" Height="25" Width="92" FontSize="16" Click="InsertSQL_Click" Canvas.Left="662" Canvas.Top="76" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Button x:Name="searchBtn" Content="Search" Height="25" Width="92" FontSize="16" Canvas.Left="662" Canvas.Top="76" HorizontalAlignment="Left" VerticalAlignment="Top" Click="SearchBtn_Click"/>
             <TextBox x:Name="InsertID" TextWrapping="Wrap" Text="Insert ID" Width="148" FontSize="16" HorizontalAlignment="Left" Canvas.Left="228" Canvas.Top="84" VerticalAlignment="Top"/>
             <TextBox x:Name="InsertPName" TextWrapping="Wrap" Text="Insert P. Name" Width="148" FontSize="16" HorizontalAlignment="Left" Canvas.Left="228" Canvas.Top="122" VerticalAlignment="Top" />
             <TextBox x:Name="InsertAmount" TextWrapping="Wrap" Text="Insert Amount" Width="148" FontSize="16" HorizontalAlignment="Left" Canvas.Left="228" Canvas.Top="163" VerticalAlignment="Top"/>
@@ -30,6 +30,7 @@
             <Label x:Name="label_pName" Content="Product Name" FontSize="16" HorizontalAlignment="Left" Canvas.Left="99" Canvas.Top="118" VerticalAlignment="Center"/>
             <Label x:Name="label_amount" Content="Amount(kg)" FontSize="16" HorizontalAlignment="Left" Canvas.Left="98" Canvas.Top="159" VerticalAlignment="Center"/>
             <Label x:Name="label_price" Content="Price(CAD)/kg" FontSize="16" HorizontalAlignment="Left" Canvas.Left="97" Canvas.Top="195" VerticalAlignment="Center"/>
+            <Button x:Name="sales" Content="Go to Sales module" Height="40" Width="163" FontSize="16" Background="#FF8DC7E8" Canvas.Left="648" Canvas.Top="501" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Click="sales_Click"/>
         </Canvas>
 
     </Grid>
