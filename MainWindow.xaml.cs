@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,21 +19,14 @@ using Npgsql;
 
 namespace FarmersMarket
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
         }
-
-
-        //Step 1. Database connection: connection String
         private static string getConnectionString()
         {
-            //Dont add spaces to the string or it wont work
             string host = "Host=localhost;";
             string port = "Port=5432;";
             string dbName = "Database=farmersMarket;";
@@ -43,11 +37,7 @@ namespace FarmersMarket
             return connectString;
         }
 
-        //Step 2. Database connection: establish connection
-
-        //Connection adapter: to help connect to postgresql database
         public static NpgsqlConnection con;
-        //Command adapter: helps to send/execute commands in the database
         public static NpgsqlCommand cmd;
 
         private static void establishConnection()
@@ -62,7 +52,14 @@ namespace FarmersMarket
             }
         }
 
+        //INDIVIDUAL THREAD
         private void InsertSQL_Click(object sender, RoutedEventArgs e)
+        {
+            Thread insertThread = new Thread(Insert_Product);
+            insertThread.Start();
+        }
+
+        public void Insert_Product()
         {
             establishConnection();
             try
@@ -70,19 +67,31 @@ namespace FarmersMarket
                 con.Open();
                 string Query = "insert into products values(@id, @product_name, @amount, @price)";
                 cmd = new NpgsqlCommand(Query, con);
-                cmd.Parameters.AddWithValue("@id", int.Parse(InsertID.Text));
-                cmd.Parameters.AddWithValue("@product_name", InsertPName.Text);
-                cmd.Parameters.AddWithValue("@amount",int.Parse(InsertAmount.Text));
-                cmd.Parameters.AddWithValue("@price",double.Parse(InsertPrice.Text));
+                this.Dispatcher.Invoke(() =>
+                {
+                    cmd.Parameters.AddWithValue("@id", int.Parse(InsertID.Text));
+                    cmd.Parameters.AddWithValue("@product_name", InsertPName.Text);
+                    cmd.Parameters.AddWithValue("@amount", int.Parse(InsertAmount.Text));
+                    cmd.Parameters.AddWithValue("@price", double.Parse(InsertPrice.Text));
+                });
+                
                 cmd.ExecuteNonQuery();
                 MessageBox.Show("Succesfully inserted in the Farmer's Market databse");
-            }catch(NpgsqlException ex)
+            }
+            catch (NpgsqlException ex)
             {
                 MessageBox.Show(ex.Message);
             }
         }
 
+        //INDIVIDUAL THREAD
         private void DeleteSQL_Click(object sender, RoutedEventArgs e)
+        {
+            Thread deleteThread = new Thread(Delete_Product);
+            deleteThread.Start();
+        }
+
+        private void Delete_Product()
         {
             establishConnection();
             try
@@ -90,29 +99,43 @@ namespace FarmersMarket
                 con.Open();
                 string Query = "Delete from products where id=@id";
                 cmd = new NpgsqlCommand(Query, con);
-                cmd.Parameters.AddWithValue("@id",int.Parse(InsertID.Text));
+                this.Dispatcher.Invoke(() =>
+                {
+                    cmd.Parameters.AddWithValue("@id", int.Parse(InsertID.Text));
+                });
                 cmd.ExecuteNonQuery();
                 MessageBox.Show("Succesfully deleted from the Farmer's Market databse");
                 con.Close();
 
-            }catch(NpgsqlException ex)
+            }
+            catch (NpgsqlException ex)
             {
                 MessageBox.Show(ex.Message);
             }
         }
 
+        //INDIVIDUAL THREAD
         private void UpdateSQL_Click(object sender, RoutedEventArgs e)
+        {
+            Thread updateThread = new Thread(Update_Product);
+            updateThread.Start();
+        }
+
+        private void Update_Product()
         {
             establishConnection();
             try
             {
                 con.Open();
-                string Query = "UPDATE public.products SET product_name=@product_name, amount=@amount, price=@price WHERE id=@id"; 
+                string Query = "UPDATE public.products SET product_name=@product_name, amount=@amount, price=@price WHERE id=@id";
                 cmd = new NpgsqlCommand(Query, con);
-                cmd.Parameters.AddWithValue("@product_name", InsertPName.Text);
-                cmd.Parameters.AddWithValue("@amount", int.Parse(InsertAmount.Text));
-                cmd.Parameters.AddWithValue("@price", double.Parse(InsertPrice.Text));
-                cmd.Parameters.AddWithValue("@id", int.Parse(InsertID.Text));
+                this.Dispatcher.Invoke(() =>
+                {
+                    cmd.Parameters.AddWithValue("@product_name", InsertPName.Text);
+                    cmd.Parameters.AddWithValue("@amount", int.Parse(InsertAmount.Text));
+                    cmd.Parameters.AddWithValue("@price", double.Parse(InsertPrice.Text));
+                    cmd.Parameters.AddWithValue("@id", int.Parse(InsertID.Text));
+                });
                 MessageBox.Show("Succesfully updated in the Farmer's Market databse");
                 cmd.ExecuteNonQuery();
                 con.Close();
@@ -123,39 +146,32 @@ namespace FarmersMarket
             }
         }
 
+        //INDIVIDUAL THREAD
         private void SelectSQL_Click(object sender, RoutedEventArgs e)
         {
-            // Establish the Connection
+            Thread selectThread = new Thread(Select_Products);
+            selectThread.Start();
+        }
+
+        private void Select_Products()
+        {
+            
             establishConnection();
-            // Open the Connection
             try
             {
                 con.Open();
                 string Query = "select * from products";
                 cmd = new NpgsqlCommand(Query, con);
-                /*
-                 * as we are going to view our data table entries in GridView, we need
-                 * a dataapater to pull the data entries and view them in the GridView
-                 In the data adapter, you need to pass the command adpater you have created
-                for your program. here, cmd is our commandadapter
-                 
-                After having the dataadpater, we need to create a datatable instance and
-                add all our pulled record to that table, We need these table to 
-                information our datagridview to know what columns and rows its going to view
-                as table
-                 */
+
                 NpgsqlDataAdapter npgsqlDataAdapter = new NpgsqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
-                npgsqlDataAdapter.Fill(dt); // this line helps to retrive the table
-                // we have created using the Data adapter, pass the structure to our
-                // regular datatable and get all the values to that table
-
-                // The following line will help us to add the values to the dataGrid view
-                dataGrid.ItemsSource = dt.AsDataView();
-
-                //This will perform the dynamic binding, It will update the grid with the
-                // passed data table information
-                DataContext = npgsqlDataAdapter;
+                npgsqlDataAdapter.Fill(dt);
+                this.Dispatcher.Invoke(() =>
+                {
+                    dataGrid.ItemsSource = dt.AsDataView();
+                    DataContext = npgsqlDataAdapter;
+                });
+                
                 con.Close();
             }
             catch (NpgsqlException ex)
@@ -171,8 +187,14 @@ namespace FarmersMarket
             this.Close();   
         }
 
-        
-        private async void  SearchBtn_Click(object sender, RoutedEventArgs e)
+        //INDIVIDUAL THREAD
+        private void  SearchBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Thread searchThread = new Thread(Search_Product);
+            searchThread.Start();
+        }
+
+        private async void Search_Product()
         {
             establishConnection();
             try
@@ -181,18 +203,18 @@ namespace FarmersMarket
                 string Query = "select * from products where id=@id";
                 // command adapter
                 cmd = new NpgsqlCommand(Query, con);
-                cmd.Parameters.AddWithValue("@id", int.Parse(searchProductID.Text));
-
-                
-                 /* in this program, we are going to add a reader to read one entry from the 
-                 database*/
-                 
+                this.Dispatcher.Invoke(() =>
+                {
+                    cmd.Parameters.AddWithValue("@id", int.Parse(searchProductID.Text));               
+                });
                 var reader = await cmd.ExecuteReaderAsync();
-
-                InsertID.Text = reader.GetOrdinal("id").ToString();
-                InsertPName.Text = reader.GetOrdinal("product_name").ToString();
-                InsertAmount.Text = reader.GetOrdinal("amount").ToString();
-                InsertPrice.Text = reader.GetOrdinal("price").ToString();
+                this.Dispatcher.Invoke(() =>
+                {
+                    InsertID.Text = reader.GetOrdinal("id").ToString();
+                    InsertPName.Text = reader.GetOrdinal("product_name").ToString();
+                    InsertAmount.Text = reader.GetOrdinal("amount").ToString();
+                    InsertPrice.Text = reader.GetOrdinal("price").ToString();
+                });
                 con.Close();
             }
             catch (NpgsqlException ex)
